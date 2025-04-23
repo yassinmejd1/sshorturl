@@ -11,7 +11,7 @@ function renderHtml(content: string, origin: string) {
       <body>
         <header>
           <img src="https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/30e0d3f6-6076-40f8-7abb-8a7676f83c00/public" />
-          <h1>🔗 Short URL API with Cloudflare D1</h1>
+          <h1>🔗 Short URL API</h1>
         </header>
         <main>
           <section>
