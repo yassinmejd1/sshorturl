@@ -1,29 +1,34 @@
-export function renderHtml(content: string) {
+export function renderHtml(content: string, origin: string): string {
   return `
     <!DOCTYPE html>
     <html lang="en">
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>D1</title>
-        <link rel="stylesheet" type="text/css" href="https://static.integrations.cloudflare.com/styles.css">
+        <title>Short URL D1</title>
+        <link rel="stylesheet" href="https://static.integrations.cloudflare.com/styles.css" />
       </head>
-    
       <body>
         <header>
           <img
             src="https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/30e0d3f6-6076-40f8-7abb-8a7676f83c00/public"
           />
-          <h1>🎉 Successfully connected sshorturl to D1</h1>
+          <h1>🔗 Short URL D1 Demo</h1>
         </header>
         <main>
-          <p>Your D1 Database contains the following data:</p>
-          <pre><code><span style="color: #0E838F">&gt; </span>SELECT * FROM comments LIMIT 3;<br>${content}</code></pre>
+          <h2>📘 How to Use</h2>
+          <p><strong>POST /</strong> with JSON body <code>{"url": "https://..."}</code> to create a short link.</p>
+          <p><strong>GET /:code</strong> to redirect to the original long URL.</p>
+          <p><strong>GET /</strong> to view recent entries from the DB.</p>
+          
+          <h3>🗂 Recent Short Links (first 5 rows)</h3>
+          <pre><code>${content}</code></pre>
+
           <small class="blue">
-            <a target="_blank" href="https://developers.cloudflare.com/d1/tutorials/build-a-comments-api/">Build a comments API with Workers and D1</a>
+            <a target="_blank" href="https://developers.cloudflare.com/d1/">Powered by Cloudflare D1</a>
           </small>
         </main>
       </body>
     </html>
-`;
+  `;
 }
