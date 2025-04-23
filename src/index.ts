@@ -68,7 +68,7 @@ export default {
           .bind(code, longUrl)
           .run();
 
-        const shortUrl = `${url.origin}/${code}`;
+        const shortUrl = `https://avshort.com/${code}`;
         return Response.json({ success: true, short: shortUrl });
       } catch (err: any) {
         return new Response("Error: " + err.message, { status: 500 });
