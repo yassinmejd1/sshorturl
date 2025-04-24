@@ -1,3 +1,16 @@
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*", // Or use "https://avshort.com" for stricter security
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+function withCors(resp: Response): Response {
+  for (const [key, value] of Object.entries(corsHeaders)) {
+    resp.headers.set(key, value);
+  }
+  return resp;
+}
+
 function renderHtml(content: string, origin: string) {
   return `
     <!DOCTYPE html>
@@ -54,13 +67,21 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname.slice(1);
 
-    // POST / => Create short URL
+    // ✅ CORS Preflight (OPTIONS)
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders,
+      });
+    }
+
+    // 🔗 POST / => Create short URL
     if (request.method === "POST" && path === "") {
       try {
         const { url: longUrl } = await request.json();
 
         if (!longUrl || !longUrl.startsWith("http")) {
-          return new Response("Invalid URL", { status: 400 });
+          return withCors(new Response("Invalid URL", { status: 400 }));
         }
 
         const code = Math.random().toString(36).substring(2, 8);
@@ -69,21 +90,21 @@ export default {
           .run();
 
         const shortUrl = `https://avshort.com/${code}`;
-        return Response.json({ success: true, short: shortUrl });
+        return withCors(Response.json({ success: true, short: shortUrl }));
       } catch (err: any) {
-        return new Response("Error: " + err.message, { status: 500 });
+        return withCors(new Response("Error: " + err.message, { status: 500 }));
       }
     }
 
-    // GET / => Home page with instructions and sample data
+    // 🏠 GET / => Render homepage with examples
     if (request.method === "GET" && path === "") {
       const { results } = await env.DB.prepare("SELECT * FROM urls LIMIT 5").all();
-      return new Response(renderHtml(JSON.stringify(results, null, 2), url.origin), {
-        headers: { "content-type": "text/html" }
-      });
+      return withCors(new Response(renderHtml(JSON.stringify(results, null, 2), url.origin), {
+        headers: { "content-type": "text/html" },
+      }));
     }
 
-    // GET /:code => Redirect to original URL
+    // 🚀 GET /:code => Redirect to original URL
     if (request.method === "GET") {
       const stmt = await env.DB.prepare("SELECT long_url FROM urls WHERE code = ?")
         .bind(path)
@@ -92,10 +113,11 @@ export default {
       if (stmt) {
         return Response.redirect(stmt.long_url, 302);
       } else {
-        return new Response("Short URL not found", { status: 404 });
+        return withCors(new Response("Short URL not found", { status: 404 }));
       }
     }
 
-    return new Response("Not Found", { status: 404 });
+    // ❌ Fallback Not Found
+    return withCors(new Response("Not Found", { status: 404 }));
   }
 };
