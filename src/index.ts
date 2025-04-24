@@ -89,7 +89,7 @@ export default {
           .bind(code, longUrl)
           .run();
 
-        const shortUrl = `https://avshort.com/${code}`;
+        const shortUrl = `https://short.avshort.com/${code}`;
         return withCors(Response.json({ success: true, short: shortUrl }));
       } catch (err: any) {
         return withCors(new Response("Error: " + err.message, { status: 500 }));
